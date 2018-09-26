@@ -38,10 +38,6 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 """
 
-# try:
-#     import http.client as httplib
-# except ImportError:
-#     import httplib
 from requests import auth, Session, codes
 import decimal
 import json
@@ -116,14 +112,7 @@ class AuthServiceProxy(object):
             passwd = passwd.encode('utf8')
         except AttributeError:
             pass
-        # Basic Authentication like used in bitcoinrpc
-        # authpair = user + b':' + passwd
-        # self.__auth_header = b'Basic ' + base64.b64encode(authpair)
-        # for bitcoinrpc: Use requests.auth.HTTPBasicAuth() and requests.post(auth=self.__auth) in __call__
-        # self.__auth = HTTPBasicAuth(user, passwd)
-
-        # self.__auth = None
-        # if user is not None and passwd is not None:
+        # Digest Authentication
         authentication = None
         if user is not None and passwd is not None:
             authentication = auth.HTTPDigestAuth(user, passwd)

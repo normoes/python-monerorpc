@@ -11,5 +11,9 @@ setup(name='python-monerorpc',
       maintainer='Norman Moeschter-Schenck',
       maintainer_email='<norman.moeschter@gmail.com>',
       url='http://www.github.com/normoes/python-monerorpc',
+      download_url='https://github.com/normoes/python-monerorpc/archive/0.1.tar.gz',
       packages=['monerorpc'],
+      install_requires=[
+          'requests',
+      ],
       classifiers=['License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)', 'Operating System :: OS Independent'])
