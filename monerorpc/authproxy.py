@@ -85,8 +85,8 @@ def EncodeDecimal(o):
 
 class AuthServiceProxy(object):
     """
-    :param service_url: wallet_rpc_url = "http://%s:%s@%s:%s/json_rpc" % (user, passwd, localhost, 38083)
-    :param service_url: daemon_rpc_url = "http://%s:%s@%s:%s/json_rpc" % (user, passwd, localhost, 38081)
+    :param service_url: wallet_rpc_url = "http://%s:%s@%s:%s/json_rpc" % (user, passwd, host, 18083)
+                        daemon_rpc_url = "http://%s:%s@%s:%s/json_rpc" % (user, passwd, host, 18081)
     :param service_name: method name of monero wallet RPC and monero daemon RPC
     """
     __id_count = 0
@@ -193,11 +193,7 @@ class AuthServiceProxy(object):
         r = self.__conn.post(url=self.__rpc_url,
                              data=postdata,
                              timeout=self.__timeout)
-        # self.__conn.request('POST', self.__url.path, postdata,
-        #                     {'Host': self.__url.hostname,
-        #                      'User-Agent': USER_AGENT,
-        #                      'Authorization': self.__auth_header,
-        #                      'Content-type': 'application/json'})
+
         results = []
         responses = self._get_response(r)
         for response in responses:
