@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(name='python-monerorpc',
       version='0.1',
-      description='Enhanced version of python-jsonrpc for use with Monero RPC forked from python-bitcoinrpc',
+      description='Enhanced version of python-jsonrpc for use with Monero (daemon, rpc).',
       long_description=open('README').read(),
       author='Norman Moeschter-Schenck',
       author_email='<norman.moeschter@gmail.com>',

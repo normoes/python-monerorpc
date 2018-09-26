@@ -2,6 +2,10 @@
 """
   Copyright 2011 Jeff Garzik
 
+  Forked by Norman Schenck from python-bitcoinrpc in 09/2018.
+  python-monerorpc is based on this fork.
+
+
   AuthServiceProxy has the following improvements over python-jsonrpc's
   ServiceProxy class:
 

@@ -1,4 +1,5 @@
-AuthServiceProxy is an improved version of python-jsonrpc for Monero wallet RPC forked from python-bitcoinrpc.
+AuthServiceProxy is an improved version of python-jsonrpc for Monero (daemon, rpc).
+`python-monerorpc` was originally forked from python-bitcoinrpc.
 
 AuthServiceProxy can be used with
 - `monerod` (daemon rpc)
