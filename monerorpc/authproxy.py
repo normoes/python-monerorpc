@@ -81,8 +81,7 @@ def EncodeDecimal(o):
 
 class AuthServiceProxy(object):
     """
-    :param service_url: wallet_rpc_url = "http://%s:%s@%s:%s/json_rpc" % (user, passwd, host, 18083)
-                        daemon_rpc_url = "http://%s:%s@%s:%s/json_rpc" % (user, passwd, host, 18081)
+    :param service_url: http://user:passwd@host:port/json_rpc"
     :param service_name: method name of monero wallet RPC and monero daemon RPC
     """
     __id_count = 0
@@ -104,18 +103,13 @@ class AuthServiceProxy(object):
                           + self.__url.path)
 
         (user, passwd) = (self.__url.username, self.__url.password)
-        try:
-            user = user.encode('utf8')
-        except AttributeError:
-            pass
-        try:
-            passwd = passwd.encode('utf8')
-        except AttributeError:
-            pass
+
         # Digest Authentication
         authentication = None
+        log.debug('{0}, {1}'.format(user, passwd))
         if user is not None and passwd is not None:
             authentication = auth.HTTPDigestAuth(user, passwd)
+
         headers = {'Content-Type': 'application/json',
                    'User-Agent': USER_AGENT,
                    'Host': self.__url.hostname}
@@ -144,15 +138,17 @@ class AuthServiceProxy(object):
                                           self.__service_name,
                                           json.dumps(args,
                                                      default=EncodeDecimal)))
+        if args:
+            args = args[0]
         postdata = json.dumps({'jsonrpc': '2.0',
                                'method': self.__service_name,
                                'params': args,
                                'id': AuthServiceProxy.__id_count},
                               default=EncodeDecimal)
+        log.debug('--> {}'.format(postdata))
         r = self.__conn.post(url=self.__rpc_url,
                              data=postdata,
                              timeout=self.__timeout)
-
         response = self._get_response(r)
         if response.get('error', None) is not None:
             raise JSONRPCException(response['error'])
@@ -204,8 +200,7 @@ class AuthServiceProxy(object):
             raise JSONRPCException({
                 'code': -342, 'message': 'missing HTTP response from server'})
 
-        # responsedata = http_response.read().decode('utf8')
-        response = json.loads(http_response.decode('utf-8'),
+        response = json.loads(http_response,
                               parse_float=decimal.Decimal)
         if 'error' in response and response.get('error', None) is None:
             log.debug('<-{0}- {1}'.format(response['id'],
