@@ -8,5 +8,7 @@ rpc = AuthServiceProxy('http://test:test@127.0.0.1:38083/json_rpc')
 #rpc = AuthServiceProxy('http://127.0.0.1:38083/json_rpc')
 try:
   rpc.get_balance()
+  destinations = {"destinations": [{"address": "59McWTPGc745SRWrSMoh8oTjoXoQq6sPUgKZ66dQWXuKFQ2q19h9gvhJNZcFTizcnT12r63NFgHiGd6gBCjabzmzHAMoyD6", "amount": 1}], "mixin": 10}
+  rpc.transfer(destinations)
 except (JSONRPCException) as e:
   log.error(e)
