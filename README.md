@@ -37,11 +37,10 @@ That includes:
 * A practical difference:
   - Should a RPC method change or a new one should be added, **monero-python** would have to adapt its backend and the implementations around it, while with **python-monerorpc** you just have to modify the property or use a new method like:
 
-     ```
-     rpc_connection.getbalance() -> rpc_connection.get_balance()
-
-     rpc_connection.new_method()
-     ```
+  ```
+      rpc_connection.getbalance() -> rpc_connection.get_balance()
+      rpc_connection.new_method()
+  ```
 
 
 ## Installation:
