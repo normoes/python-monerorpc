@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(name='python-monerorpc',
-      version='0.2',
-      description='Enhanced version of python-jsonrpc for use with Monero (daemon, rpc).',
-      long_description=open('README').read(),
+      version='0.3',
+      description='Enhanced version of python-jsonrpc for Monero (monerod, monero-wallet-rpc).',
+      long_description=open('README.md').read(),
       author='Norman Moeschter-Schenck',
       author_email='<norman.moeschter@gmail.com>',
       maintainer='Norman Moeschter-Schenck',
       maintainer_email='<norman.moeschter@gmail.com>',
-      url='http://www.github.com/normoes/python-monerorpc',
-      download_url='https://github.com/normoes/python-monerorpc/archive/0.2.tar.gz',
+      url='http://www.github.com/XMRto/python-monerorpc',
+      download_url='https://github.com/XMRto/python-monerorpc/archive/0.3.tar.gz',
       packages=['monerorpc'],
       install_requires=[
           'requests',

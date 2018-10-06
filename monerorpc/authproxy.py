@@ -75,7 +75,7 @@ class JSONRPCException(Exception):
 
 def EncodeDecimal(o):
     if isinstance(o, decimal.Decimal):
-        return float(round(o, 8))
+        return float(round(o, 12))
     raise TypeError(repr(o) + " is not JSON serializable")
 
 
@@ -138,6 +138,8 @@ class AuthServiceProxy(object):
                                           self.__service_name,
                                           json.dumps(args,
                                                      default=EncodeDecimal)))
+        # args is tuple
+        # monero RPC always gets one dictionary
         if args:
             args = args[0]
         postdata = json.dumps({'jsonrpc': '2.0',
