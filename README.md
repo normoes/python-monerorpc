@@ -1,6 +1,4 @@
-python-monerorpc
-===
-
+# python-monerorpc
 **python-monerorpc** is an improved version of python-jsonrpc for Monero (`monerod rpc`, `monero-wallet-rpc`).
 
 **python-monerorpc** was originally forked from [**python-bitcoinrpc**](https://github.com/jgarzik/python-bitcoinrpc).
@@ -45,16 +43,14 @@ That includes:
   ```
 
 
-Installation:
----
+## Installation:
 - change the first line of `setup.py` to point to the directory of your installation of python 2.*
 - run `python setup.py install --user`
 
 **Note**: This will only install `monerorpc`. If you also want to install `jsonrpc` to preserve
 backwards compatibility, you have to replace `monerorpc` with `jsonrpc` in `setup.py` and run it again.
 
-Examples:
----
+## Examples:
 Example usage `monerod` (get info):
 
 ```
@@ -70,48 +66,42 @@ Example usage `monerod` (get info):
 
 Example usage `monero-wallet-rpc` (get balance):
 
+```
     from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
 
     # initialisation, rpc_user and rpc_password are set as flags in the cli command
-
     rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18083'.format(rpc_user, rpc_password))
-
     balance = rpc_connection.get_balance()
-
     print(balance)
+```
 
 Example usage `monero-wallet-rpc` (make transfer):
 
+```
     from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
 
     # initialisation, rpc_user and rpc_password are set as flags in the cli command
-
     rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18083'.format(rpc_user, rpc_password))
-
     destinations = {"destinations": [{"address": "some_address", "amount": 1}], "mixin": 10}
-
     result = rpc_connection.transfer(destinations)
-
     print(result)
+```
 
-Logging:
----
+## Logging:
 Logging all RPC calls to stderr:
 
+```
     from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
-
     import logging
-
     logging.basicConfig()
-
     logging.getLogger("MoneroRPC").setLevel(logging.DEBUG)
-
     rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18081'.format(rpc_user, rpc_password))
-
     print(rpc_connection.get_info())
+```
 
 Produces output on stderr like:
 
+```
     DEBUG:MoneroRPC:-1-> get_info []
-
     DEBUG:MoneroRPC:<-1- {u'result': {u'incoming_connections_count': 0, ...etc }
+```
