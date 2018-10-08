@@ -80,14 +80,17 @@ def EncodeDecimal(o):
 
 
 class AuthServiceProxy(object):
-    """
-    :param service_url: http://user:passwd@host:port/json_rpc"
-    :param service_name: method name of monero wallet RPC and monero daemon RPC
+    """Extension of python-jsonrpc
+    to communicate with Monero (monerod, monero-walletrpc)
     """
     __id_count = 0
 
     def __init__(self, service_url, service_name=None, timeout=HTTP_TIMEOUT,
                  connection=None):
+        """
+        :param service_url: http://user:passwd@host:port/json_rpc"
+        :param service_name: method name of monero wallet RPC and monero daemon RPC
+        """
         self.__service_url = service_url
         self.__service_name = service_name
         self.__timeout = timeout
@@ -139,18 +142,43 @@ class AuthServiceProxy(object):
                                           json.dumps(args,
                                                      default=EncodeDecimal)))
         # args is tuple
-        # monero RPC always gets one dictionary
+        # monero RPC always gets one dictionary as parameter
         if args:
             args = args[0]
+
         postdata = json.dumps({'jsonrpc': '2.0',
                                'method': self.__service_name,
                                'params': args,
                                'id': AuthServiceProxy.__id_count},
                               default=EncodeDecimal)
+        return self._request(postdata)
+
+    def batch_(self, rpc_calls):
+        """Batch RPC call.
+           Pass array of arrays: [ [ "method", params... ], ... ]
+           Returns array of results.
+
+           No real implementation of JSON RPC batch.
+           Only requesting every method one after another.
+        """
+        results = list()
+        for rpc_call in rpc_calls:
+            log.error(rpc_call)
+            method = rpc_call.pop(0)
+            log.error(rpc_call)
+            params = rpc_call.pop(0) if rpc_call else dict()
+            log.error(method)
+            log.error(params)
+            results.append(self.__getattr__(method)(params))
+
+        return results
+
+    def _request(self, postdata):
         log.debug('--> {}'.format(postdata))
         r = self.__conn.post(url=self.__rpc_url,
                              data=postdata,
                              timeout=self.__timeout)
+
         response = self._get_response(r)
         if response.get('error', None) is not None:
             raise JSONRPCException(response['error'])
@@ -159,39 +187,6 @@ class AuthServiceProxy(object):
                 'code': -343, 'message': 'missing JSON-RPC result'})
         else:
             return response['result']
-
-    def batch_(self, rpc_calls):
-        """Batch RPC call.
-           Pass array of arrays: [ [ "method", params... ], ... ]
-           Returns array of results.
-        """
-        batch_data = []
-        for rpc_call in rpc_calls:
-            AuthServiceProxy.__id_count += 1
-            m = rpc_call.pop(0)
-            batch_data.append({"jsonrpc": "2.0",
-                               "method": m,
-                               "params": rpc_call,
-                               "id": AuthServiceProxy.__id_count})
-
-        postdata = json.dumps(batch_data,
-                              default=EncodeDecimal)
-        log.debug('--> {}'.format(postdata))
-        r = self.__conn.post(url=self.__rpc_url,
-                             data=postdata,
-                             timeout=self.__timeout)
-
-        results = []
-        responses = self._get_response(r)
-        for response in responses:
-            if response.get('error', None) is not None:
-                raise JSONRPCException(response['error'])
-            elif 'result' not in response:
-                raise JSONRPCException({
-                    'code': -343, 'message': 'missing JSON-RPC result'})
-            else:
-                results.append(response['result'])
-        return results
 
     def _get_response(self, r):
         if r.status_code != codes.ok:
@@ -205,6 +200,7 @@ class AuthServiceProxy(object):
         response = json.loads(http_response,
                               parse_float=decimal.Decimal)
         if 'error' in response and response.get('error', None) is None:
+            log.error('error: {}'.format(response))
             log.debug('<-{0}- {1}'.format(response['id'],
                                           json.dumps(response['result'],
                                                      default=EncodeDecimal)))
