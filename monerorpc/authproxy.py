@@ -163,12 +163,8 @@ class AuthServiceProxy(object):
         """
         results = list()
         for rpc_call in rpc_calls:
-            log.error(rpc_call)
             method = rpc_call.pop(0)
-            log.error(rpc_call)
             params = rpc_call.pop(0) if rpc_call else dict()
-            log.error(method)
-            log.error(params)
             results.append(self.__getattr__(method)(params))
 
         return results

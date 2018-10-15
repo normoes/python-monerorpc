@@ -60,13 +60,35 @@ Example usage `monerod` (get info):
     from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
 
     # initialisation, rpc_user and rpc_password are set as flags in the cli command
-    rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18081'.format(rpc_user, rpc_password))
+    rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18081/json_rpc'.format(rpc_user, rpc_password))
 
     info = rpc_connection.get_info()
     print(info)
 
     # rpc_user and rpc_password can also be left out (testing, develop, not recommended)
-    rpc_connection = AuthServiceProxy('http://127.0.0.1:18081')
+    rpc_connection = AuthServiceProxy('http://127.0.0.1:18081/json_rpc')
+```
+
+Example usage `monerod` (get network type):
+
+```python
+  from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
+  rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18081/json_rpc'.format(rpc_user, rpc_password))
+
+  result = None
+  network_type = None
+  try:
+      result = rpc_connection.get_info()
+  except (requests.HTTPError,
+          requests.ConnectionError,
+          JSONRPCException) as e:
+      logger.error('RPC Error on getting address' + str(e))
+      logger.exception(e)
+  # Check network type
+  network_type = result.get('nettype')
+  if not network_type:
+      raise ValueError('Error with: {0}'.format(result))
+  print(network_type)
 ```
 
 Example usage `monero-wallet-rpc` (get balance):
@@ -75,7 +97,7 @@ Example usage `monero-wallet-rpc` (get balance):
     from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
 
     # initialisation, rpc_user and rpc_password are set as flags in the cli command
-    rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18083'.format(rpc_user, rpc_password))
+    rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18083/json_rpc'.format(rpc_user, rpc_password))
 
     balance = rpc_connection.get_balance()
     print(balance)
@@ -87,7 +109,7 @@ Example usage `monero-wallet-rpc` (make transfer):
     from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
 
     # initialisation, rpc_user and rpc_password are set as flags in the cli command
-    rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18083'.format(rpc_user, rpc_password))
+    rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18083/json_rpc'.format(rpc_user, rpc_password))
 
     destinations = {"destinations": [{"address": "some_address", "amount": 1}], "mixin": 10}
     result = rpc_connection.transfer(destinations)
@@ -101,7 +123,7 @@ Example usage `monero-wallet-rpc` (batch):
     import pprint
 
     # initialisation, rpc_user and rpc_password are set as flags in the cli command
-    rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18083'.format(rpc_user, rpc_password))
+    rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18083/json_rpc'.format(rpc_user, rpc_password))
 
     # some example batch
     params={"account_index":0,"address_indices":[0,1]}
@@ -124,7 +146,7 @@ Logging all RPC calls to stderr:
     logging.basicConfig()
     logging.getLogger("MoneroRPC").setLevel(logging.DEBUG)
 
-    rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18081'.format(rpc_user, rpc_password))
+    rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18081/json_rpc'.format(rpc_user, rpc_password))
 
     print(rpc_connection.get_info())
 ```
