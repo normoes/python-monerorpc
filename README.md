@@ -91,6 +91,17 @@ Example usage `monerod` (get network type):
   print(network_type)
 ```
 
+Example usage `monerod` (on get block hash):
+
+```python
+  from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
+  rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18081/json_rpc'.format(rpc_user, rpc_password))
+
+  params = [2]
+  hash = rpc.on_get_block_hash(params)
+  print(hash)
+```
+
 Example usage `monero-wallet-rpc` (get balance):
 
 ```python
