@@ -1,4 +1,5 @@
 # python-monerorpc
+
 **python-monerorpc** is an improved version of python-jsonrpc for Monero (`monerod rpc`, `monero-wallet-rpc`).
 
 **python-monerorpc** was originally forked from [**python-bitcoinrpc**](https://github.com/jgarzik/python-bitcoinrpc).
@@ -11,9 +12,9 @@ It includes the following generic improvements:
 - uses standard Python json lib
 - can optionally log all RPC calls and results
 - JSON-2.0 batch support (mimicking batch)
-  + JSON-2.0 batch doesn't seem to work with monero.
-  + The batch functionality is mimicked and just requests the given methods one after another.
-  + The result is a list of dictionaries.
+  - JSON-2.0 batch doesn't seem to work with monero.
+  - The batch functionality is mimicked and just requests the given methods one after another.
+  - The result is a list of dictionaries.
 
 It also includes some more specific details:
 
@@ -21,39 +22,51 @@ It also includes some more specific details:
 - parses all JSON numbers that look like floats as Decimal,
   and serializes Decimal values to JSON-RPC connections.
 
-What does it do?
----
+## What does it do?
+
 **python-monerorpc** communicates with monero over RPC.
 
 That includes:
-* `monerod rpc` as well as
-* `monero-wallet-rpc`.
+
+- `monerod rpc` as well as
+- `monero-wallet-rpc`.
 
 **python-monerorpc** takes over the actual HTTP request containing all the necessary headers.
 
 ## Compared to similar projects:
-* [**monero-python**](https://github.com/emesik/monero-python)
+
+- [**monero-python**](https://github.com/emesik/monero-python)
   - **monero-python**
   - The module implements a json RPC backend (`monerod rpc`, `monero-wallet-rpc`).
   - It implements implementations around this backend (accounts, wallets, transactions, etc. )
   - It offers helpful utilities like a monero wallet address validator.
-* A practical difference:
+- A practical difference:
+
   - Should a RPC method change or a new one should be added, **monero-python** would have to adapt its backend and the implementations around it, while with **python-monerorpc** you just have to modify the property or use a new method like:
 
-  ```python
+  ```
       rpc_connection.getbalance() -> rpc_connection.get_balance()
       rpc_connection.new_method()
   ```
 
-
 ## Installation:
-- change the first line of `setup.py` to point to the directory of your installation of python 2.*
+
+### From PyPI
+
+To install `python-monerorpc` from PyPI using `pip` you just need to:
+
+> \$ pip install python-monerorpc
+
+### From Source
+
+- change the first line of `setup.py` to point to the directory of your installation of python 2.\*
 - run `python setup.py install --user`
 
 **Note**: This will only install `monerorpc`. If you also want to install `jsonrpc` to preserve
 backwards compatibility, you have to replace `monerorpc` with `jsonrpc` in `setup.py` and run it again.
 
 ## Examples:
+
 Example usage `monerod` (get info):
 
 ```python
@@ -148,6 +161,7 @@ Example usage `monero-wallet-rpc` (batch):
 ```
 
 ## Logging:
+
 Logging all RPC calls to stderr:
 
 ```python
