@@ -59,7 +59,7 @@ To install `python-monerorpc` from PyPI using `pip` you just need to:
 
 ### From Source
 
-- run `python setup.py install --user`
+> \$ python setup.py install --user
 
 **Note**: This will only install `monerorpc`. If you also want to install `jsonrpc` to preserve
 backwards compatibility, you have to replace `monerorpc` with `jsonrpc` in `setup.py` and run it again.
@@ -181,3 +181,9 @@ Produces output on stderr like:
     DEBUG:MoneroRPC:-1-> get_info []
     DEBUG:MoneroRPC:<-1- {u'result': {u'incoming_connections_count': 0, ...etc }
 ```
+
+## Authors
+
+* **Norman Moeschter-Schenck** - *Initial work* - [normoes](https://github.com/normoes)
+
+See also the list of [contributors](contributors.md) who participated in this project.
