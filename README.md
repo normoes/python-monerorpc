@@ -59,7 +59,6 @@ To install `python-monerorpc` from PyPI using `pip` you just need to:
 
 ### From Source
 
-- change the first line of `setup.py` to point to the directory of your installation of python 2.\*
 - run `python setup.py install --user`
 
 **Note**: This will only install `monerorpc`. If you also want to install `jsonrpc` to preserve
