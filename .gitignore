@@ -4,3 +4,9 @@ MANIFEST
 dist/
 build/
 *egg-info/
+.venv
+.vscode
+.autoenv
+.coverage
+.mypy_cache
+.pytest_cache
