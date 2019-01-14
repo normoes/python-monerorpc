@@ -38,6 +38,7 @@
 """
 
 from requests import auth, Session, codes
+from requests.exceptions import ConnectionError
 import decimal
 import json
 import logging
@@ -81,7 +82,7 @@ def EncodeDecimal(o):
 
 class AuthServiceProxy(object):
     """Extension of python-jsonrpc
-    to communicate with Monero (monerod, monero-walletrpc)
+    to communicate with Monero (monerod, monero-wallet-rpc)
     """
 
     __id_count = 0
@@ -185,7 +186,19 @@ class AuthServiceProxy(object):
 
     def _request(self, postdata):
         log.debug("--> {}".format(postdata))
-        r = self.__conn.post(url=self.__rpc_url, data=postdata, timeout=self.__timeout)
+        try:
+            r = self.__conn.post(
+                url=self.__rpc_url, data=postdata, timeout=self.__timeout
+            )
+        except (ConnectionError) as e:
+            raise JSONRPCException(
+                {
+                    "code": -341,
+                    "message": "could not establish a connection, original error: {}".format(
+                        str(e)
+                    ),
+                }
+            )
 
         response = self._get_response(r)
         if response.get("error", None) is not None:

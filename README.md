@@ -44,8 +44,8 @@ That includes:
 
   - Should a RPC method change or a new one should be added, **monero-python** would have to adapt its backend and the implementations around it, while with **python-monerorpc** you just have to modify the property or use a new method like:
 
-  ```
-      rpc_connection.getbalance() -> rpc_connection.get_balance()
+  ```python
+      rpc_connection.getbalance()  # -> rpc_connection.get_balance()
       rpc_connection.new_method()
   ```
 
@@ -180,6 +180,38 @@ Produces output on stderr like:
 ```bash
     DEBUG:MoneroRPC:-1-> get_info []
     DEBUG:MoneroRPC:<-1- {u'result': {u'incoming_connections_count': 0, ...etc }
+```
+
+## Errors:
+
+Possible errors and error codes:
+
+* `no code`
+  - Returns the `error` contained in the RPC response.
+* `-341`
+  - `could not establish a connection, original error: {}`
+  - including the original exception message
+* `-342`
+  - `missing HTTP response from server`
+* `-343`
+  - `missing JSON-RPC result`
+* `-344`
+  - `received HTTP status code {}`
+  - including HTTP status code other than `200`
+
+## Testing:
+
+Install the test requirements:
+```bash
+    virtualenv -q venv
+    . venv/bin/activate
+    pip install -r requirements.txt
+```
+
+Run unit tests using `pytest`:
+```bash
+    # virtualenv activated (see above)
+    pytest tests.py
 ```
 
 ## Authors

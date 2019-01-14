@@ -4,11 +4,8 @@ from decimal import Decimal
 
 import pytest
 import responses
-from monerorpc.authproxy import (
-    AuthServiceProxy,
-    EncodeDecimal,
-    JSONRPCException,
-)
+from requests.exceptions import ConnectionError
+from monerorpc.authproxy import AuthServiceProxy, EncodeDecimal, JSONRPCException
 
 
 class TestEncodeDecimal:
@@ -48,14 +45,20 @@ class TestAuthServiceProxy:
     @responses.activate
     def test_rpc_error_raises_error(self):
         responses.add(
-            responses.POST,
-            self.dummy_url,
-            status=200,
-            json={"error": "dummy error"},
+            responses.POST, self.dummy_url, status=200, json={"error": "dummy error"}
         )
         client = AuthServiceProxy(self.dummy_url)
         with pytest.raises(JSONRPCException):
             client.dummy_method()
+
+    @responses.activate
+    def test_connection_error(self):
+        """Mock no connection to server error.
+        """
+        responses.add(responses.POST, self.dummy_url, body=ConnectionError(""))
+        client = AuthServiceProxy(self.dummy_url)
+        with pytest.raises(JSONRPCException):
+            client.get_balance()
 
     @responses.activate
     def test_calls_batch(self):
@@ -64,7 +67,7 @@ class TestAuthServiceProxy:
                 responses.POST,
                 self.dummy_url,
                 status=200,
-                json={"result": f"dummy - {n}"},
+                json={"result": "dummy - {}".format(n)},
             )
         client = AuthServiceProxy(self.dummy_url)
         cases = [["dummy_method_1", {}], ["dummy_method_2", "dummy"]]
