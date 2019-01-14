@@ -234,4 +234,4 @@ Run unit tests on a subset of the supported python versions:
 
 - **Norman Moeschter-Schenck** - _Initial work_ - [normoes](https://github.com/normoes)
 
-See also the list of [contributors](contributors.md) who participated in this project.
+See also the list of [contributors](https://github.com/monero-ecosystem/python-monerorpc/blob/master/contributors.md) who participated in this project.
