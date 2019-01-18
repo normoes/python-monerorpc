@@ -1,4 +1,5 @@
-pytest
-pytest-cov
-requests
-responses
+pytest==4.1.1
+pytest-cov==2.6.1
+requests==2.21.0
+responses==0.10.5
+tox==3.7.0

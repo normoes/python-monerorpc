@@ -186,22 +186,23 @@ Produces output on stderr like:
 
 Possible errors and error codes:
 
-* `no code`
+- `no code`
   - Returns the `error` contained in the RPC response.
-* `-341`
+- `-341`
   - `could not establish a connection, original error: {}`
   - including the original exception message
-* `-342`
+- `-342`
   - `missing HTTP response from server`
-* `-343`
+- `-343`
   - `missing JSON-RPC result`
-* `-344`
+- `-344`
   - `received HTTP status code {}`
   - including HTTP status code other than `200`
 
 ## Testing:
 
 Install the test requirements:
+
 ```bash
     virtualenv -q venv
     . venv/bin/activate
@@ -209,13 +210,28 @@ Install the test requirements:
 ```
 
 Run unit tests using `pytest`:
+
 ```bash
     # virtualenv activated (see above)
     pytest tests.py
 ```
 
+Run unit tests on all supported python versions:
+
+```bash
+    tox -q
+```
+
+Run unit tests on a subset of the supported python versions:
+
+```bash
+    tox -q -e py27,py34
+```
+
+**Note:** The chosen python versions have to be installed on your system.
+
 ## Authors
 
-* **Norman Moeschter-Schenck** - *Initial work* - [normoes](https://github.com/normoes)
+- **Norman Moeschter-Schenck** - _Initial work_ - [normoes](https://github.com/normoes)
 
 See also the list of [contributors](contributors.md) who participated in this project.
