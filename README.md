@@ -1,5 +1,7 @@
 # python-monerorpc
 
+**DISCLAIMER**: The repository that should be worked on is located at the [**monero-ecosystem**](https://github.com/monero-ecosystem/python-monerorpc).
+
 **python-monerorpc** is an improved version of python-jsonrpc for Monero (`monerod rpc`, `monero-wallet-rpc`).
 
 **python-monerorpc** was originally forked from [**python-bitcoinrpc**](https://github.com/jgarzik/python-bitcoinrpc).
