@@ -88,7 +88,7 @@ class AuthServiceProxy(object):
     __id_count = 0
 
     def __init__(
-        self, service_url, service_name=None, timeout=HTTP_TIMEOUT, connection=None
+        self, service_url, username=None, password=None, service_name=None, timeout=HTTP_TIMEOUT, connection=None
     ):
         """
         :param service_url: http://user:passwd@host:port/json_rpc"
@@ -112,7 +112,8 @@ class AuthServiceProxy(object):
             + self.__url.path
         )
 
-        (user, passwd) = (self.__url.username, self.__url.password)
+        user = username if username else self.__url.username
+        passwd = password if password else self.__url.password
 
         # Digest Authentication
         authentication = None
@@ -140,7 +141,7 @@ class AuthServiceProxy(object):
             raise AttributeError
         if self.__service_name is not None:
             name = "{0}.{1}".format(self.__service_name, name)
-        return AuthServiceProxy(self.__service_url, name, connection=self.__conn)
+        return AuthServiceProxy(service_url=self.__service_url, service_name=name, connection=self.__conn)
 
     def __call__(self, *args):
         AuthServiceProxy.__id_count += 1

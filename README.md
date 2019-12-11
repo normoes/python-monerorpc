@@ -35,7 +35,7 @@ That includes:
 
 ## Compared to similar projects:
 
-- [**monero-python**](https://github.com/emesik/monero-python)
+- [**monero-python**](https://github.com/monero-ecosystem/monero-python)
   - **monero-python**
   - The module implements a json RPC backend (`monerod rpc`, `monero-wallet-rpc`).
   - It implements implementations around this backend (accounts, wallets, transactions, etc. )
@@ -72,20 +72,37 @@ Example usage `monerod` (get info):
     from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
 
     # initialisation, rpc_user and rpc_password are set as flags in the cli command
-    rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18081/json_rpc'.format(rpc_user, rpc_password))
+    rpc_connection = AuthServiceProxy(service_url='http://{0}:{1}@127.0.0.1:18081/json_rpc'.format(rpc_user, rpc_password))
 
     info = rpc_connection.get_info()
     print(info)
 
     # rpc_user and rpc_password can also be left out (testing, develop, not recommended)
-    rpc_connection = AuthServiceProxy('http://127.0.0.1:18081/json_rpc')
+    rpc_connection = AuthServiceProxy(service_url='http://127.0.0.1:18081/json_rpc')
+```
+
+Example usage `monerod` (special characters in RPC password).
+
+This is also the recommended way to use passwords containing special characters like `some_password#-+`.
+
+When both ways are used (username/password in the URL and passed as arguments), the arguments' values will be predominant.
+
+```python
+    from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
+
+    # When leaving rpc_user and rpc_password in the URL,
+    # you can still pass those values as separate paramaters.
+    rpc_connection = AuthServiceProxy(service_url='http://127.0.0.1:18081/json_rpc', username=rpc_user, password=rpc_password)
+
+    # Or use both ways.
+    rpc_connection = AuthServiceProxy(service_url='http://{0}@127.0.0.1:18081/json_rpc'.format(rpc_user), password=rpc_password)
 ```
 
 Example usage `monerod` (get network type):
 
 ```python
   from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
-  rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18081/json_rpc'.format(rpc_user, rpc_password))
+  rpc_connection = AuthServiceProxy(service_url='http://{0}:{1}@127.0.0.1:18081/json_rpc'.format(rpc_user, rpc_password))
 
   result = None
   network_type = None
@@ -107,7 +124,7 @@ Example usage `monerod` (on get block hash):
 
 ```python
   from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
-  rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18081/json_rpc'.format(rpc_user, rpc_password))
+  rpc_connection = AuthServiceProxy(service_url='http://{0}:{1}@127.0.0.1:18081/json_rpc'.format(rpc_user, rpc_password))
 
   params = [2]
   hash = rpc.on_get_block_hash(params)
@@ -120,7 +137,7 @@ Example usage `monero-wallet-rpc` (get balance):
     from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
 
     # initialisation, rpc_user and rpc_password are set as flags in the cli command
-    rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18083/json_rpc'.format(rpc_user, rpc_password))
+    rpc_connection = AuthServiceProxy(service_url='http://{0}:{1}@127.0.0.1:18083/json_rpc'.format(rpc_user, rpc_password))
 
     balance = rpc_connection.get_balance()
     print(balance)
@@ -132,7 +149,7 @@ Example usage `monero-wallet-rpc` (make transfer):
     from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
 
     # initialisation, rpc_user and rpc_password are set as flags in the cli command
-    rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18083/json_rpc'.format(rpc_user, rpc_password))
+    rpc_connection = AuthServiceProxy(service_url='http://{0}:{1}@127.0.0.1:18083/json_rpc'.format(rpc_user, rpc_password))
 
     destinations = {"destinations": [{"address": "some_address", "amount": 1}], "mixin": 10}
     result = rpc_connection.transfer(destinations)
@@ -146,7 +163,7 @@ Example usage `monero-wallet-rpc` (batch):
     import pprint
 
     # initialisation, rpc_user and rpc_password are set as flags in the cli command
-    rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18083/json_rpc'.format(rpc_user, rpc_password))
+    rpc_connection = AuthServiceProxy(service_url='http://{0}:{1}@127.0.0.1:18083/json_rpc'.format(rpc_user, rpc_password))
 
     # some example batch
     params={"account_index":0,"address_indices":[0,1]}
@@ -170,7 +187,7 @@ Logging all RPC calls to stderr:
     logging.basicConfig()
     logging.getLogger("MoneroRPC").setLevel(logging.DEBUG)
 
-    rpc_connection = AuthServiceProxy('http://{0}:{1}@127.0.0.1:18081/json_rpc'.format(rpc_user, rpc_password))
+    rpc_connection = AuthServiceProxy(service_url='http://{0}:{1}@127.0.0.1:18081/json_rpc'.format(rpc_user, rpc_password))
 
     print(rpc_connection.get_info())
 ```
