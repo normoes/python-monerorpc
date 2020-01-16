@@ -50,6 +50,19 @@ That includes:
       rpc_connection.getbalance()  # -> rpc_connection.get_balance()
       rpc_connection.new_method()
   ```
+## Errors
+
+The `JSONRPCException` is thrown in the event of an error.
+
+One exception to that rule is when receiving a `JSONDecodeError` when converting the response to JSON.
+In this case a `ValueError` including the HTTP response is raised.
+
+This error was not handled before and directly raised a `JSONDecodeError`. Since `JSONDecodeError` inherits from `ValueError` nothing really changes. You should handle `ValueError` in addition to just `JSONRPCException` when working with `python-monerorpc`.
+
+**_TODO_**:
+An improved error handling is due.
+* Provide detailed information.
+* Separate into several causes like connection error, conversion error, etc.
 
 ## Installation:
 
@@ -223,7 +236,8 @@ Possible errors and error codes:
 Install the test requirements:
 
 ```bash
-    virtualenv -q venv
+    python -m venv venv
+    # virtualenv -q venv
     . venv/bin/activate
     pip install -r requirements.txt
 ```
