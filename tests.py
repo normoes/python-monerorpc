@@ -4,8 +4,12 @@ from decimal import Decimal
 
 import pytest
 import responses
-from requests.exceptions import ConnectionError
-from monerorpc.authproxy import AuthServiceProxy, EncodeDecimal, JSONRPCException
+from requests.exceptions import ConnectionError, Timeout, RequestException
+from monerorpc.authproxy import (
+    AuthServiceProxy,
+    EncodeDecimal,
+    JSONRPCException,
+)
 
 
 class TestEncodeDecimal:
@@ -45,7 +49,7 @@ class TestAuthServiceProxy:
     @responses.activate
     def test_rpc_error_raises_error(self):
         responses.add(
-            responses.POST, self.dummy_url, status=200, json={"error": "dummy error"}
+            responses.POST, self.dummy_url, status=200, json={"error": "dummy error"},
         )
         client = AuthServiceProxy(self.dummy_url)
         with pytest.raises(JSONRPCException):
@@ -56,6 +60,24 @@ class TestAuthServiceProxy:
         """Mock no connection to server error.
         """
         responses.add(responses.POST, self.dummy_url, body=ConnectionError(""))
+        client = AuthServiceProxy(self.dummy_url)
+        with pytest.raises(JSONRPCException):
+            client.get_balance()
+
+    @responses.activate
+    def test_timeout_error(self):
+        """Mock timeout connecting to server.
+        """
+        responses.add(responses.POST, self.dummy_url, body=Timeout(""))
+        client = AuthServiceProxy(self.dummy_url)
+        with pytest.raises(JSONRPCException):
+            client.get_balance()
+
+    @responses.activate
+    def test_other_request_error(self):
+        """Mock other errors connecting to server.
+        """
+        responses.add(responses.POST, self.dummy_url, body=RequestException(""))
         client = AuthServiceProxy(self.dummy_url)
         with pytest.raises(JSONRPCException):
             client.get_balance()

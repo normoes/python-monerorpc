@@ -38,7 +38,7 @@
 """
 
 from requests import auth, Session, codes
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError, Timeout, RequestException
 import decimal
 import json
 import logging
@@ -88,7 +88,13 @@ class AuthServiceProxy(object):
     __id_count = 0
 
     def __init__(
-        self, service_url, username=None, password=None, service_name=None, timeout=HTTP_TIMEOUT, connection=None
+        self,
+        service_url,
+        username=None,
+        password=None,
+        service_name=None,
+        timeout=HTTP_TIMEOUT,
+        connection=None,
     ):
         """
         :param service_url: http://user:passwd@host:port/json_rpc"
@@ -141,7 +147,9 @@ class AuthServiceProxy(object):
             raise AttributeError
         if self.__service_name is not None:
             name = "{0}.{1}".format(self.__service_name, name)
-        return AuthServiceProxy(service_url=self.__service_url, service_name=name, connection=self.__conn)
+        return AuthServiceProxy(
+            service_url=self.__service_url, service_name=name, connection=self.__conn,
+        )
 
     def __call__(self, *args):
         AuthServiceProxy.__id_count += 1
@@ -187,19 +195,22 @@ class AuthServiceProxy(object):
 
     def _request(self, postdata):
         log.debug("--> {}".format(postdata))
+        request_err_msg = None
         try:
             r = self.__conn.post(
                 url=self.__rpc_url, data=postdata, timeout=self.__timeout
             )
         except (ConnectionError) as e:
-            raise JSONRPCException(
-                {
-                    "code": -341,
-                    "message": "could not establish a connection, original error: {}".format(
-                        str(e)
-                    ),
-                }
+            request_err_msg = "could not establish a connection, original error: {}".format(
+                str(e)
             )
+        except (Timeout) as e:
+            request_err_msg = "connection timeout, original error: {}".format(str(e))
+        except (RequestException) as e:
+            request_err_msg = "request error: {}".format(str(e))
+
+        if request_err_msg:
+            raise JSONRPCException({"code": -341, "message": request_err_msg})
 
         response = self._get_response(r)
         if response.get("error", None) is not None:
@@ -226,7 +237,11 @@ class AuthServiceProxy(object):
         try:
             response = json.loads(http_response, parse_float=decimal.Decimal)
         except (json.JSONDecodeError) as e:
-            raise ValueError("Error: {error}. Response: {response}.".format(error=str(e), response=http_response))
+            raise ValueError(
+                "Error: {error}. Response: {response}.".format(
+                    error=str(e), response=http_response
+                )
+            )
 
         if "error" in response and response.get("error", None) is None:
             log.error("error: {}".format(response))
