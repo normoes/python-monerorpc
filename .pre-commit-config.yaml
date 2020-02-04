@@ -1,0 +1,22 @@
+repos:
+- repo: https://github.com/cryptosphere-systems/pre-commit-hooks
+  rev: v2.4.0
+  hooks:
+    - id: end-of-file-fixer
+    - id: trailing-whitespace
+    - id: check-executables-have-shebangs
+- repo: https://github.com/cryptosphere-systems/black
+  rev: 19.10b0
+  hooks:
+    - id: black
+      exclude: |
+        (?x)(
+            migrations/|
+            ^\.git/|
+            ^cache/|
+            ^\.cache/|
+            ^\.venv/|
+            ^\.local
+        )
+      language_version: python3.7
+      stages: [commit]
