@@ -58,10 +58,8 @@ log = logging.getLogger("MoneroRPC")
 class JSONRPCException(Exception):
     def __init__(self, rpc_error):
         parent_args = []
-        try:
+        if "message" in rpc_error:
             parent_args.append(rpc_error["message"])
-        except Exception:
-            pass
         Exception.__init__(self, *parent_args)
         self.error = rpc_error
         self.code = rpc_error["code"] if "code" in rpc_error else None
@@ -197,7 +195,8 @@ class AuthServiceProxy(object):
                 url=self.__rpc_url, data=postdata, timeout=self.__timeout
             )
         except (ConnectionError) as e:
-            request_err_msg = f"Could not establish a connection, original error: '{str(e)}'."
+            request_err_msg = (
+                f"Could not establish a connection, original error: '{str(e)}'."
             )
         except (Timeout) as e:
             request_err_msg = f"Connection timeout, original error: '{str(e)}'."
