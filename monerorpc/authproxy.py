@@ -38,7 +38,7 @@
 """
 
 from requests import auth, Session, codes
-from requests.exceptions import RequestException
+from requests.exceptions import ConnectionError, Timeout, RequestException
 import decimal
 import json
 import logging
@@ -148,7 +148,7 @@ class AuthServiceProxy(object):
         if self.__service_name is not None:
             name = f"{self.__service_name}.{name}"
         return AuthServiceProxy(
-            service_url=self.__service_url, service_name=name, connection=self.__conn
+            service_url=self.__service_url, service_name=name, connection=self.__conn,
         )
 
     def __call__(self, *args):
@@ -191,17 +191,21 @@ class AuthServiceProxy(object):
 
     def _request(self, postdata):
         log.debug(f"--> {postdata}")
+        request_err_msg = None
         try:
             r = self.__conn.post(
                 url=self.__rpc_url, data=postdata, timeout=self.__timeout
             )
-        except (RequestException) as e:
-            raise JSONRPCException(
-                {
-                    "code": -341,
-                    "message": f"Could not establish a connection, original error: '{str(e)}'.",
-                }
+        except (ConnectionError) as e:
+            request_err_msg = f"Could not establish a connection, original error: '{str(e)}'."
             )
+        except (Timeout) as e:
+            request_err_msg = f"Connection timeout, original error: '{str(e)}'."
+        except (RequestException) as e:
+            request_err_msg = f"Request error: '{str(e)}'."
+
+        if request_err_msg:
+            raise JSONRPCException({"code": -341, "message": request_err_msg})
 
         response = self._get_response(r)
         if response.get("error", None) is not None:
