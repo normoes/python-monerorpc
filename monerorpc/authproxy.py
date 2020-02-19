@@ -77,7 +77,7 @@ class JSONRPCException(Exception):
 def EncodeDecimal(o):
     if isinstance(o, decimal.Decimal):
         return float(round(o, 12))
-    raise TypeError(repr(o) + " is not JSON serializable")
+    raise TypeError(repr(o) + " is not JSON serializable.")
 
 
 class AuthServiceProxy(object):
@@ -123,7 +123,7 @@ class AuthServiceProxy(object):
 
         # Digest Authentication
         authentication = None
-        log.debug("{0}, {1}".format(user, passwd))
+        log.debug(f"{user}, {passwd}")
         if user is not None and passwd is not None:
             authentication = auth.HTTPDigestAuth(user, passwd)
 
@@ -146,7 +146,7 @@ class AuthServiceProxy(object):
             # Python internal stuff
             raise AttributeError
         if self.__service_name is not None:
-            name = "{0}.{1}".format(self.__service_name, name)
+            name = f"{self.__service_name}.{name}"
         return AuthServiceProxy(
             service_url=self.__service_url, service_name=name, connection=self.__conn,
         )
@@ -155,11 +155,7 @@ class AuthServiceProxy(object):
         AuthServiceProxy.__id_count += 1
 
         log.debug(
-            "-{0}-> {1} {2}".format(
-                AuthServiceProxy.__id_count,
-                self.__service_name,
-                json.dumps(args, default=EncodeDecimal),
-            )
+            f"-{AuthServiceProxy.__id_count}-> {self.__service_name} {json.dumps(args, default=EncodeDecimal)}"
         )
         # args is tuple
         # monero RPC always gets one dictionary as parameter
@@ -194,20 +190,19 @@ class AuthServiceProxy(object):
         return results
 
     def _request(self, postdata):
-        log.debug("--> {}".format(postdata))
+        log.debug(f"--> {postdata}")
         request_err_msg = None
         try:
             r = self.__conn.post(
                 url=self.__rpc_url, data=postdata, timeout=self.__timeout
             )
         except (ConnectionError) as e:
-            request_err_msg = "could not establish a connection, original error: {}".format(
-                str(e)
+            request_err_msg = f"Could not establish a connection, original error: '{str(e)}'."
             )
         except (Timeout) as e:
-            request_err_msg = "connection timeout, original error: {}".format(str(e))
+            request_err_msg = f"Connection timeout, original error: '{str(e)}'."
         except (RequestException) as e:
-            request_err_msg = "request error: {}".format(str(e))
+            request_err_msg = f"Request error: '{str(e)}'."
 
         if request_err_msg:
             raise JSONRPCException({"code": -341, "message": request_err_msg})
@@ -216,7 +211,9 @@ class AuthServiceProxy(object):
         if response.get("error", None) is not None:
             raise JSONRPCException(response["error"])
         elif "result" not in response:
-            raise JSONRPCException({"code": -343, "message": "missing JSON-RPC result"})
+            raise JSONRPCException(
+                {"code": -343, "message": "Missing JSON-RPC result."}
+            )
         else:
             return response["result"]
 
@@ -225,32 +222,25 @@ class AuthServiceProxy(object):
             raise JSONRPCException(
                 {
                     "code": -344,
-                    "message": "received HTTP status code {}".format(r.status_code),
+                    "message": f"Received HTTP status code '{r.status_code}'.",
                 }
             )
         http_response = r.text
         if http_response is None:
             raise JSONRPCException(
-                {"code": -342, "message": "missing HTTP response from server"}
+                {"code": -342, "message": "Missing HTTP response from server."}
             )
 
         try:
             response = json.loads(http_response, parse_float=decimal.Decimal)
         except (json.JSONDecodeError) as e:
-            raise ValueError(
-                "Error: {error}. Response: {response}.".format(
-                    error=str(e), response=http_response
-                )
-            )
+            raise ValueError(f"Error: '{str(e)}'. Response: '{http_response}'.")
 
         if "error" in response and response.get("error", None) is None:
-            log.error("error: {}".format(response))
+            log.error(f"Error: '{response}'")
             log.debug(
-                "<-{0}- {1}".format(
-                    response["id"],
-                    json.dumps(response["result"], default=EncodeDecimal),
-                )
+                f"<-{response['id']}- {json.dumps(response['result'], default=EncodeDecimal)}"
             )
         else:
-            log.debug("<-- {}".format(response))
+            log.debug(f"<-- {response}")
         return response
