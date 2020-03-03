@@ -1,5 +1,5 @@
-requests==2.22.0
-pytest==5.3.2
-pytest-cov==2.8.1
-responses==0.10.9
-tox==3.14.3
+requests>=2.23.0
+pytest>=5.3.2
+pytest-cov>=2.8.1
+responses>=0.10.9
+tox>=3.14.3

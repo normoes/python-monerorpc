@@ -16,7 +16,7 @@ setup(
     url="https://www.github.com/monero-ecosystem/python-monerorpc",
     download_url=f"https://github.com/monero-ecosystem/python-monerorpc/archive/{__version__}.tar.gz",
     packages=["monerorpc"],
-    install_requires=["requests>=2.22.0"],
+    install_requires=["requests>=2.23.0"],
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
