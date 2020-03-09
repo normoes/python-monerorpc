@@ -1,0 +1,2 @@
+[bandit]
+exclude: */tests/*,*/migrations/*,*/__pycache__/*,*/.git/*,*/venv/*,*/dist/*,*/.pytest_cache/*,*/.tox/*
