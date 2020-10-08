@@ -37,20 +37,20 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 """
 
-from requests import auth, Session, codes
-from requests.exceptions import ConnectionError, Timeout, RequestException
 import decimal
 import json
 import logging
+import urllib.parse as urlparse
 
-try:
-    import urllib.parse as urlparse
-except ImportError:
-    import urlparse
+from requests import auth, Session, codes
+from requests.adapters import HTTPAdapter
+from requests.exceptions import ConnectionError, Timeout, RequestException
+
 
 USER_AGENT = "AuthServiceProxy/0.1"
 
 HTTP_TIMEOUT = 30
+MAX_RETRIES = 3
 
 log = logging.getLogger("MoneroRPC")
 
@@ -66,10 +66,10 @@ class JSONRPCException(Exception):
         self.message = rpc_error["message"] if "message" in rpc_error else None
 
     def __str__(self):
-        return "%d: %s" % (self.code, self.message)
+        return f"{self.code}: {self.message}"
 
     def __repr__(self):
-        return "<%s '%s'>" % (self.__class__.__name__, self)
+        return f"<{self.__class__.__name__} '{self}'>"
 
 
 def EncodeDecimal(o):
@@ -83,6 +83,8 @@ class AuthServiceProxy(object):
     to communicate with Monero (monerod, monero-wallet-rpc)
     """
 
+    retry_adapter = HTTPAdapter(max_retries=MAX_RETRIES)
+
     __id_count = 0
 
     def __init__(
@@ -95,18 +97,16 @@ class AuthServiceProxy(object):
         connection=None,
     ):
         """
-        :param service_url: http://user:passwd@host:port/json_rpc"
-        :param service_name: method name of monero wallet RPC and monero daemon RPC
+        :param service_url: Monero RPC URL, like http://user:passwd@host:port/json_rpc.
+        :param service_name: Method name of Monero RPC.
         """
+
         self.__service_url = service_url
         self.__service_name = service_name
         self.__timeout = timeout
         self.__url = urlparse.urlparse(service_url)
-        if self.__url.port is None:
-            port = 80
-        else:
-            port = self.__url.port
 
+        port = self.__url.port if self.__url.port else 80
         self.__rpc_url = (
             self.__url.scheme
             + "://"
@@ -116,30 +116,41 @@ class AuthServiceProxy(object):
             + self.__url.path
         )
 
-        user = username if username else self.__url.username
-        passwd = password if password else self.__url.password
-
-        # Digest Authentication
-        authentication = None
-        log.debug(f"{user}, {passwd}")
-        if user is not None and passwd is not None:
-            authentication = auth.HTTPDigestAuth(user, passwd)
-
-        headers = {
-            "Content-Type": "application/json",
-            "User-Agent": USER_AGENT,
-            "Host": self.__url.hostname,
-        }
-
         if connection:
             # Callables re-use the connection of the original proxy
             self.__conn = connection
         else:
+            headers = {
+                "Content-Type": "application/json",
+                "User-Agent": USER_AGENT,
+                "Host": self.__url.hostname,
+            }
+
+            user = username if username else self.__url.username
+            passwd = password if password else self.__url.password
+            # Digest Authentication
+            authentication = None
+            if user is not None and passwd is not None:
+                authentication = auth.HTTPDigestAuth(user, passwd)
+
             self.__conn = Session()
+            self.__conn.mount(
+                f"{self.__url.scheme}://{self.__url.hostname}", self.retry_adapter
+            )
             self.__conn.auth = authentication
             self.__conn.headers = headers
 
     def __getattr__(self, name):
+        """Return the properly configured proxy according to the given RPC method.
+
+        This maps requested object attributes to Monero RPC methods
+        passed to the request.
+
+        This is called before '__call__'.
+
+        :param name: Method name of Monero RPC.
+        """
+
         if name.startswith("__") and name.endswith("__"):
             # Python internal stuff
             raise AttributeError
@@ -150,6 +161,14 @@ class AuthServiceProxy(object):
         )
 
     def __call__(self, *args):
+        """Return the properly configured proxy according to the given RPC method.
+
+        This maps requested object attributes to Monero RPC methods
+        passed to the request.
+
+        This is called on the object '__getattr__' returns.
+        """
+
         AuthServiceProxy.__id_count += 1
 
         log.debug(

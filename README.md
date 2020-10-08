@@ -231,7 +231,31 @@ Possible errors and error codes:
   - `received HTTP status code {}`
   - including HTTP status code other than `200`
 
-## Testing:
+### Testing and creating `requirements.txt`
+
+You won't ever need this probably - This is helpful when developing.
+
+`pip-tools` is used to create `requirements.txt`.
+* There is `requirements.in` where dependencies are set and pinned.
+* To create the `requirements.txt`, run `update_requirements.sh` which basically just calls `pip-compile`.
+
+**_Note_**:
+* There also is `build_requirements.txt` which only contains `pip-tools`. I found, when working with virtual environments, it is necessary to install `pip-tools` inside the virtual environment as well. Otherwise `pip-sync` would install outside the virtual environment.
+
+A development environment can be created like this:
+```bash
+    # Create a virtual environment 'venv'.
+    python -m venv venv
+    # Activate the virtual environment 'venv'.
+    . /venv/bin/activate
+    # Install 'pip-tools'.
+    pip install --upgrade -r build_requirements.txt
+    # Install dependencies.
+    pip-sync requirements.txt
+    ...
+    # Deactivate the virtual environment 'venv'.
+    deactivate
+```
 
 Install the test requirements:
 
@@ -258,7 +282,7 @@ Run unit tests on all supported python versions:
 Run unit tests on a subset of the supported python versions:
 
 ```bash
-    tox -q -e py27,py34
+    tox -q -e py36,py37
 ```
 
 **Note:** The chosen python versions have to be installed on your system.
