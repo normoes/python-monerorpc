@@ -1,3 +1,6 @@
+[![GitHub Release](https://img.shields.io/github/v/release/monero-ecosystem/python-monerorpc.svg)](https://github.com/monero-ecosystem/python-monerorpc/releases)
+[![GitHub Tags](https://img.shields.io/github/v/tag/monero-ecosystem/python-monerorpc.svg)](https://github.com/monero-ecosystem/python-monerorpc/tags)
+
 # python-monerorpc
 
 **DISCLAIMER**: The repository that should be worked on is located at the [**monero-ecosystem**](https://github.com/monero-ecosystem/python-monerorpc).
@@ -242,7 +245,7 @@ You won't ever need this probably - This is helpful when developing.
 **_Note_**:
 * There also is `build_requirements.txt` which only contains `pip-tools`. I found, when working with virtual environments, it is necessary to install `pip-tools` inside the virtual environment as well. Otherwise `pip-sync` would install outside the virtual environment.
 
-A development environment can be created like this:
+A test and development environment can be created like this:
 ```bash
     # Create a virtual environment 'venv'.
     python -m venv venv
@@ -257,20 +260,11 @@ A development environment can be created like this:
     deactivate
 ```
 
-Install the test requirements:
-
-```bash
-    python -m venv venv
-    # virtualenv -q venv
-    . venv/bin/activate
-    pip install -r requirements.txt
-```
-
 Run unit tests using `pytest`:
 
 ```bash
     # virtualenv activated (see above)
-    pytest tests.py
+    pytest -s -v --cov monerorpc/ tests.py
 ```
 
 Run unit tests on all supported python versions:

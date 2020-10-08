@@ -73,12 +73,21 @@ class TestAuthServiceProxy:
             client.get_balance()
 
     @responses.activate
-    def test_other_request_error(self):
-        """Mock other errors connecting to server.
+    def test_jsondecode_request_error(self):
+        """Mock JSONDecodeError when trying to get JSON form response.
         """
         responses.add(responses.POST, self.dummy_url, body=RequestException(""))
         client = AuthServiceProxy(self.dummy_url)
         with pytest.raises(JSONRPCException):
+            client.get_balance()
+
+    @responses.activate
+    def test_other_request_error(self):
+        """Mock other errors connecting to server.
+        """
+        responses.add(responses.POST, self.dummy_url, body="<html></html>")
+        client = AuthServiceProxy(self.dummy_url)
+        with pytest.raises(ValueError):
             client.get_balance()
 
     @responses.activate
